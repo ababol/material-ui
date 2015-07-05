@@ -1,50 +1,47 @@
-function isObject(obj) {
-  return typeof(obj) === 'object' && obj !== null;
-}
+// http://stackoverflow.com/questions/1187518/javascript-array-difference
+Array.prototype.diff = function(a) {
+    return this.filter(function(i) {return a.indexOf(i) < 0;});
+};
 
-/**
-*  A recursive merge between two objects.
-*
-*  @param base     - the object whose properties are to be overwritten. It
-*                    should be either the root level or some nested level.
-*  @param override - an object containing properties to be overwritten. It
-*                    should have the same structure as the object object.
+/** 
+*  A recursive merge between two objects. 
+* 
+*  @param object     - the object whose properties are to be overwritten. It
+*                     should be either the root level or some nested level.
+*  @param overrides - an object containing properties to be overwritten. It 
+*                     should have the same structure as the object object.
 */
-let extend = (base, override) => {
+var extend = function(object, overrides) {
+  var mergeObject = {};
 
-  let mergedObject = {};
+  function isValidOverride(value) { return value || value === '' || value === null || value === 0; }
 
-  //Loop through each key in the base object
-  Object.keys(base).forEach((key) => {
+  Object.keys(object).forEach(function(currentKey) {
 
-    let baseProp = base[key];
-    let overrideProp;
-
-    if (isObject(override)) overrideProp = override[key];
-
-    //Recursive call extend if the prop is another object, else just copy it over
-    mergedObject[key] = isObject(baseProp) && !Array.isArray(baseProp) ?
-      extend(baseProp, overrideProp) : baseProp;
+    // Arrays and null are also objects, 
+    var overridesIsValidObject = object[currentKey] && !Array.isArray(object[currentKey]);
+    
+    // Recursive call to next level
+    if (typeof(object[currentKey]) === 'object' && overridesIsValidObject) {
+      mergeObject[currentKey] = extend(object[currentKey], overrides[currentKey]);
+    } else {
+      if (overrides && isValidOverride(overrides[currentKey])) {
+        mergeObject[currentKey] = overrides[currentKey];
+      } else {
+        mergeObject[currentKey] = object[currentKey];
+      }
+    }
 
   });
 
-  //Loop through each override key and override the props in the
-  //base object
-  if (isObject(override)) {
-
-    Object.keys(override).forEach((overrideKey) => {
-
-      let overrideProp = override[overrideKey];
-
-      //Only copy over props that are not objects
-      if (!isObject(overrideProp) || Array.isArray(overrideProp)) {
-        mergedObject[overrideKey] = overrideProp;
-      }
-
+  // Overrides not defined in object are immediately added.
+  if (overrides && typeof(overrides) === 'object' && !Array.isArray(overrides)) {
+    Object.keys(overrides).diff(Object.keys(object)).forEach(function(currentDiff) {
+      mergeObject[currentDiff] = overrides[currentDiff];
     });
   }
 
-  return mergedObject;
+  return mergeObject;
 };
 
 module.exports = extend;
