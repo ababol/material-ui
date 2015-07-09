@@ -1,13 +1,12 @@
 let React = require('react');
-let Styles = require('../styles');
 
 let CardActions = React.createClass({
   getStyles() {
     return {
       root: {
-        padding: 8
-      }
-    }
+        padding: 8,
+      },
+    };
   },
 
   render() {
@@ -15,7 +14,7 @@ let CardActions = React.createClass({
 
     let children = React.Children.map(this.props.children, (child) => {
       return React.cloneElement(child, {
-        style: {marginRight: 8}
+        style: {marginRight: 8},
       });
     });
 
@@ -24,7 +23,7 @@ let CardActions = React.createClass({
         {children}
       </div>
     );
-  }
+  },
 });
 
 module.exports = CardActions;

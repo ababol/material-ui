@@ -15,12 +15,12 @@ let FocusRipple = React.createClass({
     color: React.PropTypes.string,
     opacity: React.PropTypes.number,
     show: React.PropTypes.bool,
-    innerStyle: React.PropTypes.object
+    innerStyle: React.PropTypes.object,
   },
 
   getDefaultProps() {
     return {
-      color: Colors.darkBlack
+      color: Colors.darkBlack,
     };
   },
 
@@ -30,17 +30,16 @@ let FocusRipple = React.createClass({
   },
 
   render() {
-
     let outerStyles = this.mergeAndPrefix({
       height: '100%',
       width: '100%',
       position: 'absolute',
       top: 0,
       left: 0,
-      transition: Transitions.easeOut(null, 'opacity'),
+      transition: Transitions.easeOut(null, ['transform', 'opacity']),
       transform: this.props.show ? 'scale(1)' : 'scale(0)',
       opacity: this.props.show ? 1 : 0,
-      overflow: 'hidden'
+      overflow: 'hidden',
     }, this.props.style);
 
     let innerStyles = this.mergeAndPrefix({
@@ -50,7 +49,7 @@ let FocusRipple = React.createClass({
       borderRadius: '50%',
       opacity: this.props.opacity ? this.props.opacity : 0.16,
       backgroundColor: this.props.color,
-      transition: Transitions.easeOut(pulsateDuration + 'ms', null, null, Transitions.easeInOutFunction)
+      transition: Transitions.easeOut(pulsateDuration + 'ms', 'transform', null, Transitions.easeInOutFunction),
     }, this.props.innerStyle);
 
     return (
@@ -85,7 +84,7 @@ let FocusRipple = React.createClass({
 
     el.style.height = size + 'px';
     el.style.top = (size / 2 * -1) + (height / 2) + 'px';
-  }
+  },
 
 });
 

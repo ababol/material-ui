@@ -1,6 +1,5 @@
 let React = require('react');
 let CssEvent = require('../utils/css-event');
-let Dom = require('../utils/dom');
 let KeyLine = require('../utils/key-line');
 let KeyCode = require('../utils/key-code');
 let StylePropable = require('../mixins/style-propable');
@@ -10,7 +9,6 @@ let Paper = require('../paper');
 let MenuItem = require('./menu-item');
 let LinkMenuItem = require('./link-menu-item');
 let SubheaderMenuItem = require('./subheader-menu-item');
-let WindowListenable = require('../mixins/window-listenable');
 
 
 /***********************
@@ -21,7 +19,7 @@ var NestedMenuItem = React.createClass({
   mixins: [ClickAwayable, StylePropable],
 
   contextTypes: {
-    muiTheme: React.PropTypes.object
+    muiTheme: React.PropTypes.object,
   },
 
   propTypes: {
@@ -37,14 +35,14 @@ var NestedMenuItem = React.createClass({
 
   getDefaultProps() {
     return {
-      disabled: false
+      disabled: false,
     };
   },
 
   getInitialState() {
     return {
       open: false ,
-      activeIndex:0
+      activeIndex: 0,
     };
   },
 
@@ -72,29 +70,30 @@ var NestedMenuItem = React.createClass({
         userSelect: 'none',
         cursor: 'pointer',
         lineHeight: this.getTheme().height + 'px',
-        color: this.context.muiTheme.palette.textColor
+        color: this.context.muiTheme.palette.textColor,
       },
       icon: {
         float: 'left',
         lineHeight: this.getTheme().height + 'px',
-        marginRight: this.getSpacing().desktopGutter
+        marginRight: this.getSpacing().desktopGutter,
       },
       toggle: {
         marginTop: ((this.getTheme().height - this.context.muiTheme.component.radioButton.size) / 2),
         float: 'right',
-        width: 42
+        width: 42,
       },
       rootWhenHovered: {
-        backgroundColor: this.getTheme().hoverColor
+        backgroundColor: this.getTheme().hoverColor,
       },
       rootWhenSelected: {
-        color: this.getTheme().selectedTextColor
+        color: this.getTheme().selectedTextColor,
       },
       rootWhenDisabled: {
         cursor: 'default',
-        color: this.context.muiTheme.palette.disabledColor
-      }
+        color: this.context.muiTheme.palette.disabledColor,
+      },
     };
+
     return styles;
   },
 
@@ -103,16 +102,15 @@ var NestedMenuItem = React.createClass({
   },
 
   render() {
-
     let styles = this.getStyles();
     styles = this.mergeAndPrefix(styles.root,
       (this.props.active && !this.props.disabled) && styles.rootWhenHovered, {
-      position: 'relative'
+      position: 'relative',
     }, this.props.style);
 
     let iconCustomArrowDropRight = {
       marginRight: this.getSpacing().desktopGutterMini * -1,
-      color: this.context.muiTheme.component.dropDownMenu.accentColor
+      color: this.context.muiTheme.component.dropDownMenu.accentColor,
     };
 
     let {
@@ -188,7 +186,7 @@ var NestedMenuItem = React.createClass({
 
   _handleMouseOut(e) {
     if (!this.props.disabled && this.props.onMouseOut) this.props.onMouseOut(e,this.props.index);
-  }
+  },
 
 });
 
@@ -201,7 +199,7 @@ var Menu = React.createClass({
   mixins: [StylePropable],
 
   contextTypes: {
-    muiTheme: React.PropTypes.object
+    muiTheme: React.PropTypes.object,
   },
 
   propTypes: {
@@ -225,7 +223,7 @@ var Menu = React.createClass({
   getInitialState() {
     return {
       nestedMenuShown: false,
-      activeIndex:0
+      activeIndex: 0,
     };
   },
 
@@ -235,7 +233,7 @@ var Menu = React.createClass({
       hideable: false,
       visible: true,
       zDepth: 1,
-      onRequestClose() {}
+      onRequestClose: () => {},
     };
   },
 
@@ -253,6 +251,11 @@ var Menu = React.createClass({
     if (this.props.visible !== prevProps.visible) this._renderVisibility();
   },
 
+  componentWillReceiveProps() {
+    //Set the menu width
+    this._setKeyWidth(React.findDOMNode(this));
+  },
+
   getTheme() {
     return this.context.muiTheme.component.menu;
   },
@@ -268,23 +271,23 @@ var Menu = React.createClass({
         paddingTop: this.getSpacing().desktopGutterMini,
         paddingBottom: this.getSpacing().desktopGutterMini,
         transition: Transitions.easeOut(null, 'height'),
-        outline:'none !important'
+        outline:'none !important',
       },
       subheader: {
         paddingLeft: this.context.muiTheme.component.menuSubheader.padding,
-        paddingRight: this.context.muiTheme.component.menuSubheader.padding
+        paddingRight: this.context.muiTheme.component.menuSubheader.padding,
       },
       hideable: {
-        opacity: (this.props.visible) ? 1 : 0,
         overflow: 'hidden',
         position: 'absolute',
         top: 0,
-        zIndex: 1
+        zIndex: 1,
       },
       item: {
-        height:34
-      }
+        height: 34,
+      },
     };
+
     return styles;
   },
 
@@ -306,7 +309,7 @@ var Menu = React.createClass({
   },
 
   _getChildren() {
-    let  menuItem,
+    let menuItem,
       itemComponent,
       isDisabled;
 
@@ -420,69 +423,108 @@ var Menu = React.createClass({
   },
 
   _setKeyWidth(el) {
-    let menuWidth = this.props.autoWidth ?
-      KeyLine.getIncrementalDim(el.offsetWidth) + 'px' :
-      '100%';
-
     //Update the menu width
-    Dom.withoutTransition(el, () => {
-      el.style.width = menuWidth;
-    });
+    let menuWidth = '100%';
+
+    if (this.props.autoWidth) {
+      el.style.width = 'auto';
+      menuWidth = KeyLine.getIncrementalDim(el.offsetWidth) + 'px';
+    }
+
+    el.style.width = menuWidth;
   },
 
   _renderVisibility() {
-    let el;
-
     if (this.props.hideable) {
-      el = React.findDOMNode(this);
-      let container = React.findDOMNode(this.refs.paperContainer);
-
-      if (this.props.visible) {
-        //Hide the element and allow the browser to automatically resize it.
-        el.style.transition = '';
-        el.style.visibility = 'hidden';
-        el.style.height = 'auto';
-
-        //Determine the height of the menu.
-        let padding = this.getSpacing().desktopGutterMini;
-        let height = el.offsetHeight +
-            //Add padding to the offset height, because it is not yet set in the style.
-            (padding * 2);
-
-        //Unhide the menu with the height set back to zero.
-        el.style.height = '0px';
-        el.style.visibility = 'visible';
-
-        //Add transition if it is not already defined.
-        el.style.transition = Transitions.easeOut();
-
-        //Open the menu
-        setTimeout(() => {
-          // Yeild to the DOM, then apply height and padding. This makes the transition smoother.
-          el.style.paddingTop = padding + 'px';
-          el.style.paddingBottom = padding + 'px';
-          el.style.height = height + 'px';
-
-          //Set the overflow to visible after the animation is done so
-          //that other nested menus can be shown
-          CssEvent.onTransitionEnd(el, () => {
-            //Make sure the menu is open before setting the overflow.
-            //This is to accout for fast clicks
-            if (this.props.visible) container.style.overflow = 'visible';
-            el.focus();
-          });
-        }, 0);
-      }
-      else {
-        //Close the menu
-        el.style.height = '0px';
-        el.style.paddingTop = '0px';
-        el.style.paddingBottom = '0px';
-
-        //Set the overflow to hidden so that animation works properly
-        container.style.overflow = 'hidden';
-      }
+      if (this.props.visible) this._expandHideableMenu();
+      else this._collapseHideableMenu();
     }
+  },
+
+  _expandHideableMenu() {
+    let el = React.findDOMNode(this);
+    let container = React.findDOMNode(this.refs.paperContainer);
+    let padding = this.getSpacing().desktopGutterMini;
+    let height = this._getHiddenMenuHeight(el, padding);
+
+    //Add transition
+    if (!el.style.transition) {
+      el.style.transition = Transitions.easeOut();
+    }
+
+    this._nextAnimationFrame(() => {
+      container.style.overflow = 'hidden';
+
+      // Yeild to the DOM, then apply height and padding. This makes the transition smoother.
+      el.style.paddingTop = padding + 'px';
+      el.style.paddingBottom = padding + 'px';
+      el.style.height = height + 'px';
+      el.style.opacity = 1;
+
+      //Set the overflow to visible after the animation is done so
+      //that other nested menus can be shown
+      CssEvent.onTransitionEnd(el, () => {
+        //Make sure the menu is open before setting the overflow.
+        //This is to accout for fast clicks
+        if (this.props.visible) container.style.overflow = 'visible';
+        el.style.transition = null;
+        el.focus();
+      });
+    });
+  },
+
+  _getHiddenMenuHeight(el, padding) {
+    //Add padding to the offset height, because it is not yet set in the style.
+    let height = padding * 2;
+
+    //Hide the element and allow the browser to automatically resize it.
+    el.style.visibility = 'hidden';
+    el.style.height = 'auto';
+
+    //Determine the height of the menu.
+    height += el.offsetHeight;
+
+    //Unhide the menu with the height set back to zero.
+    el.style.height = '0px';
+    el.style.visibility = 'visible';
+
+    return height;
+  },
+
+  _collapseHideableMenu() {
+    let el = React.findDOMNode(this);
+    let container = React.findDOMNode(this.refs.paperContainer);
+    let originalOpacity = el.style.opacity;
+
+    //Add transition
+    if (!el.style.transition && originalOpacity !== '') {
+      el.style.transition = Transitions.easeOut();
+    }
+
+    this._nextAnimationFrame(function () {
+      //Set the overflow to hidden so that animation works properly
+      container.style.overflow = 'hidden';
+
+      //Close the menu
+      el.style.opacity = 0;
+      el.style.height = '0px';
+      el.style.paddingTop = '0px';
+      el.style.paddingBottom = '0px';
+
+      let end = () => {
+        el.style.transition = null;
+      };
+
+      if (originalOpacity === '') end();
+      else CssEvent.onTransitionEnd(el, end);
+    });
+  },
+
+  _nextAnimationFrame(func) {
+    if (window.requestAnimationFrame) {
+      return window.requestAnimationFrame(func);
+    }
+    return setTimeout(func, 16);
   },
 
   _onNestedItemTap(e, index, menuItem) {
@@ -500,7 +542,7 @@ var Menu = React.createClass({
     this.setState({activeIndex: index});
   },
   _onItemDeactivated(e, index) {
-    if (this.state.activeKey == index)
+    if (this.state.activeKey === index)
       this.setState({activeIndex: 0});
   },
 
@@ -566,10 +608,9 @@ var Menu = React.createClass({
 
   _tryToggleNested(index) {
     let item = this.refs[index];
-    let toggleMenu = item.toggleNestedMenu;
     if (item && item.toggleNestedMenu)
       item.toggleNestedMenu();
-  }
+  },
 
 });
 

@@ -7,11 +7,11 @@ let TableFooter = React.createClass({
   mixins: [StylePropable],
 
   contextTypes: {
-    muiTheme: React.PropTypes.object
+    muiTheme: React.PropTypes.object,
   },
 
   propTypes: {
-    columns: React.PropTypes.array.isRequired
+    columns: React.PropTypes.array.isRequired,
   },
 
   getDefaultProps() {
@@ -30,8 +30,8 @@ let TableFooter = React.createClass({
         verticalAlign: 'bottom',
         padding: 20,
         textAlign: 'left',
-        whiteSpace: 'nowrap'
-      }
+        whiteSpace: 'nowrap',
+      },
     };
 
     return styles;
@@ -65,7 +65,7 @@ let TableFooter = React.createClass({
         ...props
       } = footerData[index];
       if (content === undefined) content = footerData[index];
-      let key = keyPrefix + index
+      let key = keyPrefix + index;
       props.style = (props.style !== undefined) ? this.mergeAndPrefix(props.style, styles.cell) : styles.cell;
 
       footers.push(
@@ -76,7 +76,7 @@ let TableFooter = React.createClass({
     }
 
     return footers;
-  }
+  },
 
 });
 

@@ -9,28 +9,29 @@ let List = React.createClass({
   mixins: [StylePropable],
 
   contextTypes: {
-    muiTheme: React.PropTypes.object
+    muiTheme: React.PropTypes.object,
   },
 
   propTypes: {
     insetSubheader: React.PropTypes.bool,
     subheader: React.PropTypes.string,
-    subheaderStyle: React.PropTypes.object
+    subheaderStyle: React.PropTypes.object,
+    zDepth: React.PropTypes.oneOf([0, 1, 2, 3, 4, 5]),
   },
 
   getDefaultProps() {
     return {
-      zDepth: 0
+      zDepth: 0,
     };
   },
 
   render() {
-
     let {
       insetSubheader,
       style,
       subheader,
       subheaderStyle,
+      zDepth,
       ...other
     } = this.props;
 
@@ -38,7 +39,7 @@ let List = React.createClass({
       root: {
         padding: 0,
         paddingBottom: 8,
-        paddingTop: subheader ? 0 : 8
+        paddingTop: subheader ? 0 : 8,
       },
 
       subheader: {
@@ -46,8 +47,8 @@ let List = React.createClass({
         fontSize: 14,
         fontWeight: Typography.fontWeightMedium,
         lineHeight: '48px',
-        paddingLeft: insetSubheader ? 72 : 16
-      }
+        paddingLeft: insetSubheader ? 72 : 16,
+      },
     };
 
     let mergedRootStyles = this.mergeStyles(styles.root, style);
@@ -60,12 +61,13 @@ let List = React.createClass({
     return (
       <Paper
         {...other}
-        style={mergedRootStyles}>
+        style={mergedRootStyles}
+        zDepth={zDepth}>
         {subheaderElement}
         {this.props.children}
       </Paper>
     );
-  }
+  },
 });
 
 module.exports = List;

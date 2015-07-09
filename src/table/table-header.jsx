@@ -9,7 +9,7 @@ let TableHeader = React.createClass({
   mixins: [StylePropable],
 
   contextTypes: {
-    muiTheme: React.PropTypes.object
+    muiTheme: React.PropTypes.object,
   },
 
   propTypes: {
@@ -18,14 +18,14 @@ let TableHeader = React.createClass({
     onSelectAll: React.PropTypes.func,
     displaySelectAll: React.PropTypes.bool,
     enableSelectAll: React.PropTypes.bool,
-    fixed: React.PropTypes.bool
+    fixed: React.PropTypes.bool,
   },
 
   getDefaultProps() {
     return {
       displaySelectAll: true,
       enableSelectAll: true,
-      fixed: true
+      fixed: true,
     };
   },
 
@@ -36,8 +36,8 @@ let TableHeader = React.createClass({
   getStyles() {
     let styles = {
       root:  {
-        borderBottom: '1px solid ' + this.getTheme().borderColor
-      }
+        borderBottom: '1px solid ' + this.getTheme().borderColor,
+      },
     };
 
     return styles;
@@ -86,7 +86,6 @@ let TableHeader = React.createClass({
   },
 
   _getHeaderColumns(headerData, keyPrefix) {
-    let styles = this.getStyles();
     let headers = [];
 
     for (let index = 0; index < headerData.length; index++) {
@@ -120,8 +119,8 @@ let TableHeader = React.createClass({
       content: checkbox,
       style: {
         paddingLeft: 24,
-        paddingRight: 24
-      }
+        paddingRight: 24,
+      },
     };
   },
 
@@ -131,7 +130,7 @@ let TableHeader = React.createClass({
 
   _onColumnClick(e, columnNumber) {
     if (this.props.onColumnClick) this.props.onColumnClick(e, columnNumber);
-  }
+  },
 
 });
 

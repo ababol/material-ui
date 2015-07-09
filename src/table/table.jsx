@@ -4,7 +4,6 @@ let ClickAwayable = require('../mixins/click-awayable');
 let TableHeader = require('./table-header');
 let TableRow = require('./table-row');
 let TableFooter = require('./table-footer');
-let DOM = require('../utils/dom');
 
 
 let Table = React.createClass({
@@ -12,7 +11,7 @@ let Table = React.createClass({
   mixins: [StylePropable, ClickAwayable],
 
   contextTypes: {
-    muiTheme: React.PropTypes.object
+    muiTheme: React.PropTypes.object,
   },
 
   propTypes: {
@@ -20,6 +19,7 @@ let Table = React.createClass({
     canSelectAll: React.PropTypes.bool,
     columnOrder: React.PropTypes.array,
     defaultColumnWidth: React.PropTypes.string,
+    deselectOnClickaway: React.PropTypes.bool,
     displayRowCheckbox: React.PropTypes.bool,
     displaySelectAll: React.PropTypes.bool,
     fixedFooter: React.PropTypes.bool,
@@ -39,13 +39,14 @@ let Table = React.createClass({
     preScanRowData: React.PropTypes.bool,
     selectable: React.PropTypes.bool,
     showRowHover: React.PropTypes.bool,
-    stripedRows: React.PropTypes.bool
+    stripedRows: React.PropTypes.bool,
   },
 
   getDefaultProps() {
     return {
       canSelectAll: false,
       defaultColumnWidth: '50px',
+      deselectOnClickaway: true,
       displayRowCheckbox: true,
       displaySelectAll: true,
       fixedFooter: true,
@@ -55,7 +56,7 @@ let Table = React.createClass({
       preScanRowData: true,
       selectable: true,
       showRowHover: false,
-      stripedRows: false
+      stripedRows: false,
     };
   },
 
@@ -76,7 +77,7 @@ let Table = React.createClass({
     }
 
     return {
-      selectedRows: preSelectedRows
+      selectedRows: preSelectedRows,
     };
   },
 
@@ -92,24 +93,26 @@ let Table = React.createClass({
         width: '100%',
         borderCollapse: 'collapse',
         borderSpacing: 0,
-        tableLayout: 'fixed'
+        tableLayout: 'fixed',
       },
       bodyTable: {
         height: (this.props.fixedHeader || this.props.fixedFooter) ? this.props.height : 'auto',
         overflowX: 'hidden',
-        overflowY: 'auto'
+        overflowY: 'auto',
       },
       tableWrapper: {
         height: (this.props.fixedHeader || this.props.fixedFooter) ? 'auto' : this.props.height,
-        overflow: 'auto'
-      }
+        overflow: 'auto',
+      },
     };
 
     return styles;
   },
 
   componentClickAway() {
-    if (this.state.selectedRows.length) this.setState({ selectedRows: [] });
+    if (this.props.deselectOnClickaway && this.state.selectedRows.length) {
+      this.setState({ selectedRows: [] });
+    }
   },
 
   render() {
@@ -272,8 +275,8 @@ let Table = React.createClass({
       if (column.style === undefined) {
         column.style = {
           width: this.props.defaultColumnWidth,
-          maxWidth: this.props.defaultColumnWidth
-        }
+          maxWidth: this.props.defaultColumnWidth,
+        };
       }
       else {
         if (column.style.width === undefined) column.style.width = this.props.defaultColumnWidth;
@@ -312,10 +315,11 @@ let Table = React.createClass({
   },
 
   _handleRowClick(e, rowNumber) {
-    // Prevent text selection while selecting rows.
-    window.getSelection().removeAllRanges();
+    e.stopPropagation();
 
     if (this.props.selectable) {
+      // Prevent text selection while selecting rows.
+      window.getSelection().removeAllRanges();
       this._processRowSelection(e, rowNumber);
     }
   },
@@ -325,7 +329,6 @@ let Table = React.createClass({
 
     if (e.shiftKey && this.props.multiSelectable && selectedRows.length) {
       let lastSelection = selectedRows[selectedRows.length - 1];
-      let start, end, direction;
 
       if (typeof lastSelection === 'object') {
         lastSelection.end = rowNumber;
@@ -357,8 +360,8 @@ let Table = React.createClass({
   },
 
   _handleCellClick(e, rowNumber, columnNumber) {
+    e.stopPropagation();
     if (this.props.onCellClick) this.props.onCellClick(rowNumber, this._getColumnId(columnNumber));
-    this._handleRowClick(e, rowNumber);
   },
 
   _handleRowHover(e, rowNumber) {
@@ -389,8 +392,7 @@ let Table = React.createClass({
     columnId = (this.props.columnOrder.length) ? this.props.columnOrder[columnId] : columnId;
 
     return columnId;
-  }
-
+  },
 
 });
 
