@@ -60,6 +60,12 @@ class IconMenus extends React.Component {
         name: 'Props',
         infoArray: [
           {
+            name: 'closeOnItemTouchTap',
+            type: 'bool',
+            header: 'default: true',
+            desc: 'If true, menu will close after an item is touchTapped.'
+          },
+          {
             name: 'desktop',
             type: 'bool',
             header: 'default: false',
@@ -109,7 +115,7 @@ class IconMenus extends React.Component {
             type: 'number',
             header: 'default: 200',
             desc: 'Sets the delay in milliseconds before closing the menu when an item is clicked.'
-          }
+          },
         ]
       },
       {

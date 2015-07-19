@@ -14,7 +14,7 @@ let SubheaderMenuItem = require('./subheader-menu-item');
 /***********************
 * Nested Menu Component
 ***********************/
-var NestedMenuItem = React.createClass({
+let NestedMenuItem = React.createClass({
 
   mixins: [ClickAwayable, StylePropable],
 
@@ -194,7 +194,7 @@ var NestedMenuItem = React.createClass({
 /****************
 * Menu Component
 ****************/
-var Menu = React.createClass({
+let Menu = React.createClass({
 
   mixins: [StylePropable],
 
@@ -248,7 +248,9 @@ var Menu = React.createClass({
   },
 
   componentDidUpdate(prevProps) {
-    if (this.props.visible !== prevProps.visible) this._renderVisibility();
+    if (this.props.visible !== prevProps.visible || this.props.menuItems.length !== prevProps.menuItems.length) {
+      this._renderVisibility();
+    }
   },
 
   componentWillReceiveProps() {
@@ -384,8 +386,8 @@ var Menu = React.createClass({
               menuItems={menuItem.items}
               menuItemStyle={this.props.menuItemStyle}
               zDepth={this.props.zDepth}
-              onMouseOver={this._onItemActivated}
-              onMouseOut={this._onItemDeactivated}
+              onMouseEnter={this._onItemActivated}
+              onMouseLeave={this._onItemDeactivated}
               onItemTap={this._onNestedItemTap} />
           );
           this._nestedChildren.push(i);
@@ -409,8 +411,8 @@ var Menu = React.createClass({
               onToggle={this.props.onToggle}
               disabled={isDisabled}
               onTouchTap={this._onItemTap}
-              onMouseOver={this._onItemActivated}
-              onMouseOut={this._onItemDeactivated}
+              onMouseEnter={this._onItemActivated}
+              onMouseLeave={this._onItemDeactivated}
               >
               {menuItem.text}
             </MenuItem>
