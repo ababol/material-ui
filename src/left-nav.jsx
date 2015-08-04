@@ -21,6 +21,7 @@ let LeftNav = React.createClass({
 
   propTypes: {
     className: React.PropTypes.string,
+    disableSwipeToOpen: React.PropTypes.bool,
     docked: React.PropTypes.bool,
     header: React.PropTypes.element,
     menuItems: React.PropTypes.array.isRequired,
@@ -29,6 +30,9 @@ let LeftNav = React.createClass({
     onNavClose: React.PropTypes.func,
     openRight: React.PropTypes.bool,
     selectedIndex: React.PropTypes.number,
+    menuItemClassName: React.PropTypes.string,
+    menuItemClassNameSubheader: React.PropTypes.string,
+    menuItemClassNameLink: React.PropTypes.string,
   },
 
   windowListeners: {
@@ -38,6 +42,7 @@ let LeftNav = React.createClass({
 
   getDefaultProps() {
     return {
+      disableSwipeToOpen: false,
       docked: true,
     };
   },
@@ -144,7 +149,7 @@ let LeftNav = React.createClass({
       overlay = (
         <Overlay
           ref="overlay"
-          show={this.state.open}
+          show={this.state.open || !!this.state.swiping}
           transitionEnabled={!this.state.swiping}
           onTouchTap={this._onOverlayTouchTap}
         />
@@ -172,6 +177,9 @@ let LeftNav = React.createClass({
               menuItemStyle={this.mergeAndPrefix(styles.menuItem)}
               menuItemStyleLink={this.mergeAndPrefix(styles.menuItemLink)}
               menuItemStyleSubheader={this.mergeAndPrefix(styles.menuItemSubheader)}
+              menuItemClassName={this.props.menuItemClassName}
+              menuItemClassNameSubheader={this.props.menuItemClassNameSubheader}
+              menuItemClassNameLink={this.props.menuItemClassNameLink}
               selectedIndex={selectedIndex}
               onItemTap={this._onMenuItemClick} />
         </Paper>
@@ -238,7 +246,10 @@ let LeftNav = React.createClass({
   },
 
   _onBodyTouchStart(e) {
-    if (!this.state.open && openNavEventHandler !== this._onBodyTouchStart) {
+    if (!this.state.open &&
+         (openNavEventHandler !== this._onBodyTouchStart ||
+          this.props.disableSwipeToOpen)
+       ) {
       return;
     }
 
@@ -293,7 +304,6 @@ let LeftNav = React.createClass({
         this._swipeStartX = currentX;
         this.setState({
           swiping: this.state.open ? 'closing' : 'opening',
-          open: true,
         });
         this._setPosition(this._getTranslateX(currentX));
       }
@@ -309,6 +319,7 @@ let LeftNav = React.createClass({
       let translateRatio = this._getTranslateX(currentX) / this._getMaxTranslateX();
 
       this._maybeSwiping = false;
+      let swiping = this.state.swiping;
       this.setState({
         swiping: null,
       });
@@ -316,10 +327,18 @@ let LeftNav = React.createClass({
       // We have to open or close after setting swiping to null,
       // because only then CSS transition is enabled.
       if (translateRatio > 0.5) {
-        this.close();
+        if (swiping === 'opening') {
+          this._setPosition(this._getMaxTranslateX());
+        } else {
+          this.close();
+        }
       }
       else {
-        this._setPosition(0);
+        if (swiping === 'opening') {
+          this.open();
+        } else {
+          this._setPosition(0);
+        }
       }
     }
     else {
